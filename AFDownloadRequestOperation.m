@@ -88,6 +88,11 @@ typedef void (^AFURLConnectionProgressiveOperationProgressBlock)(AFDownloadReque
         if (!isResuming) {
             int fileDescriptor = open([tempPath UTF8String], O_CREAT | O_EXCL | O_RDWR, 0666);
             if (fileDescriptor > 0) close(fileDescriptor);
+            NSError *error = nil;
+            [[NSFileManager defaultManager] setAttributes:@{NSFileProtectionKey : NSFileProtectionComplete} ofItemAtPath:tempPath error:&error];
+            if (error) {
+                NSLog(@"Could not set attributes of temp file %@ because %@", tempPath, [error localizedDescription]);
+            }
         }
 
         self.outputStream = [NSOutputStream outputStreamToFileAtPath:tempPath append:isResuming];
